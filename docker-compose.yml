@@ -142,16 +142,3 @@ services:
       - "8082:80"
     depends_on:
       - mysql_server   
-  phpmyadmin_rm:
-    container_name: cn_phpmyadmin_rm
-    image: phpmyadmin/phpmyadmin:5.2
-    restart: always
-    environment:
-      PMA_HOST: MYSQL5026.site4now.net
-      PMA_PORT: 3306
-      MYSQL_ROOT_PASSWORD: a7m1425.
-      UPLOAD_LIMIT: 300M
-    ports:
-      - "8083:80"
-    depends_on:
-      - mysql_server   
