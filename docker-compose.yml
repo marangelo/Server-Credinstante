@@ -1,21 +1,21 @@
 version: "3.7"
 services:
-  # nginx-proxy-manager:
-  #   image: 'jc21/nginx-proxy-manager:2.11.1'
-  #   container_name: cn_nginx-proxy-manage 
-  #   ports:
-  #     - '80:80'
-  #     - '81:81'
-  #     - '443:443'
-  #   environment:
-  #     DB_MYSQL_HOST: mysql_server
-  #     DB_MYSQL_PORT: 3306
-  #     DB_MYSQL_USER: "root"
-  #     DB_MYSQL_PASSWORD: ${PZW_ROOT}
-  #     DB_MYSQL_NAME: "npm"
-  #   volumes:
-  #     - ./data:/data
-  #     - ./letsencrypt:/etc/letsencrypt
+  nginx-proxy-manager:
+    image: 'jc21/nginx-proxy-manager:2.11.1'
+    container_name: cn_nginx-proxy-manage 
+    ports:
+      - '80:80'
+      - '81:81'
+      - '443:443'
+    environment:
+      DB_MYSQL_HOST: mysql_server
+      DB_MYSQL_PORT: 3306
+      DB_MYSQL_USER: "root"
+      DB_MYSQL_PASSWORD: ${PZW_ROOT}
+      DB_MYSQL_NAME: "npm"
+    volumes:
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
 
   web_credinstante:
     container_name: cn_credi-app
