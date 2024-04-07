@@ -1,0 +1,157 @@
+version: "3.7"
+services:
+  # nginx-proxy-manager:
+  #   image: 'jc21/nginx-proxy-manager:2.11.1'
+  #   container_name: cn_nginx-proxy-manage 
+  #   ports:
+  #     - '80:80'
+  #     - '81:81'
+  #     - '443:443'
+  #   environment:
+  #     DB_MYSQL_HOST: mysql_server
+  #     DB_MYSQL_PORT: 3306
+  #     DB_MYSQL_USER: "root"
+  #     DB_MYSQL_PASSWORD: ${PZW_ROOT}
+  #     DB_MYSQL_NAME: "npm"
+  #   volumes:
+  #     - ./data:/data
+  #     - ./letsencrypt:/etc/letsencrypt
+
+  web_credinstante:
+    container_name: cn_credi-app
+    #image: kooldev/php:7.4-nginx-sqlsrv
+    image: kooldev/php:7.4-nginx-sqlsrv-prod
+    restart: always
+    volumes:
+      - "./www/credinstantes:/app/credinstantes"
+      - "./default.tmpl:/kool/default.tmpl"
+    ports:
+      - "84:80"
+    environment:
+      - APP_NAME=credinstantes
+      - PHP_FPM_LISTEN=/run/php-fpm.sock
+      - NGINX_LISTEN=80
+      - NGINX_ROOT=/app/credinstantes/public
+      - NGINX_INDEX=index.php
+      - NGINX_CLIENT_MAX_BODY_SIZE=25M
+      - NGINX_PHP_FPM=unix:/run/php-fpm.sock
+      - NGINX_FASTCGI_READ_TIMEOUT=60s
+      - NGINX_FASTCGI_BUFFERS=8 8k
+      - NGINX_FASTCGI_BUFFER_SIZE=16k
+      - PHP_UPLOAD_MAX_FILESIZE=50M
+      - PHP_POST_MAX_SIZE=50M
+
+  web_credi-site:
+    container_name: cn_credi-site
+    #image: kooldev/php:7.4-nginx-sqlsrv
+    image: kooldev/php:7.4-nginx
+    restart: always
+    volumes:
+      - "./www/site:/app/site"
+      - "./default.tmpl:/kool/default.tmpl"
+    ports:
+      - "82:80"
+    environment:
+      - APP_NAME=site
+      - PHP_FPM_LISTEN=/run/php-fpm.sock
+      - NGINX_LISTEN=80
+      - NGINX_ROOT=/app/site
+      - NGINX_INDEX=index.html
+      - NGINX_CLIENT_MAX_BODY_SIZE=25M
+      - NGINX_PHP_FPM=unix:/run/php-fpm.sock
+      - NGINX_FASTCGI_READ_TIMEOUT=60s
+      - NGINX_FASTCGI_BUFFERS=8 8k
+      - NGINX_FASTCGI_BUFFER_SIZE=16k
+      - PHP_UPLOAD_MAX_FILESIZE=50M
+      - PHP_POST_MAX_SIZE=50M
+
+  mysql_server:
+    container_name: "cn_mysql_server"
+    image: mysql:5.7    
+    environment:
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_ROOT_PASSWORD: ${PZW_ROOT}
+      MYSQL_PORT: ${Credi_PORT}
+      MYSQL_USER: ${MYSQL_USER_CREDI}
+      MYSQL_PASSWORD: ${MYSQL_PASS_CREDI}
+      MYSQL_LOWER_CASE_TABLE_NAMES: 0
+    restart: always
+    ports:
+      - 4406:3306
+
+
+  mysql-backup:
+    container_name : cn_mysql_backup
+    image: fradelg/mysql-cron-backup:1.13.1
+    volumes:
+      - ./BackUp:/backup
+    environment:
+      - MYSQL_HOST=mysql_server
+      - MYSQL_USER=${MYSQL_USER_CREDI}
+      - MYSQL_PASS=${MYSQL_PASS_CREDI}
+      - MAX_BACKUPS=15
+      - INIT_BACKUP=0
+      - CRON_TIME=0 23 * * *
+      - TZ=America/Managua
+      - GZIP_LEVEL=9
+    restart: unless-stopped
+
+  mysql-restore:
+    image: fradelg/mysql-cron-backup:1.13.1
+    container_name : cn_mysql_restore
+    command: "/restore.sh /backup/latest.db_credinsta.sql.gz"
+    depends_on:
+      - mysql_master
+    volumes:
+      - ./BackUp:/backup
+    environment:
+      - MYSQL_HOST=mysql_master
+      - MYSQL_PORT=3306
+      - MYSQL_USER=root
+      - MYSQL_PASS=a7m1425.
+
+  rclone-gdrive:
+    container_name: cn_credi_rclone
+    image: pfidr/rclone:1.63.0  
+    restart: unless-stopped
+    volumes:
+      - ./rclone:/config
+      - ./BackUp:/gdrive
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - "RCLONE_CMD=sync"
+      - "TZ=America/Managua"
+      - "SYNC_SRC=/gdrive"
+      - "SYNC_DEST=gdrive:/BackUp"
+      - "CRON=20 23 * * *"
+      - "FORCE_SYNC=1"
+      - "SYNC_OPTS=-v"
+      - "CHECK_URL=https://hc-ping.com/f927de2e-995f-4296-bd83-e2ffd8274a59"
+
+  phpmyadmin:
+    container_name: cn_phpmyadmin
+    image: phpmyadmin/phpmyadmin:5.2
+    restart: always
+    environment:
+      PMA_HOST: mysql_server
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: ${PZW_ROOT}
+      UPLOAD_LIMIT: 300M
+    ports:
+      - "8082:80"
+    depends_on:
+      - mysql_server   
+  phpmyadmin_rm:
+    container_name: cn_phpmyadmin_rm
+    image: phpmyadmin/phpmyadmin:5.2
+    restart: always
+    environment:
+      PMA_HOST: MYSQL5026.site4now.net
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: a7m1425.
+      UPLOAD_LIMIT: 300M
+    ports:
+      - "8083:80"
+    depends_on:
+      - mysql_server   
