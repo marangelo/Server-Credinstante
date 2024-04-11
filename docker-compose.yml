@@ -25,8 +25,8 @@ services:
     volumes:
       - "./www/credinstantes:/app/credinstantes"
       - "./default.tmpl:/kool/default.tmpl"
-    ports:
-      - "84:80"
+    # ports:
+    #   - "84:80"
     environment:
       - APP_NAME=credinstantes
       - PHP_FPM_LISTEN=/run/php-fpm.sock
@@ -49,8 +49,8 @@ services:
     volumes:
       - "./www/site:/app/site"
       - "./default.tmpl:/kool/default.tmpl"
-    ports:
-      - "82:80"
+    # ports:
+    #   - "82:80"
     environment:
       - APP_NAME=site
       - PHP_FPM_LISTEN=/run/php-fpm.sock
@@ -96,19 +96,19 @@ services:
       - GZIP_LEVEL=9
     restart: unless-stopped
 
-  mysql-restore:
-    image: fradelg/mysql-cron-backup:1.13.1
-    container_name : cn_mysql_restore
-    command: "/restore.sh /backup/latest.db_credinsta.sql.gz"
-    depends_on:
-      - mysql_master
-    volumes:
-      - ./BackUp:/backup
-    environment:
-      - MYSQL_HOST=mysql_master
-      - MYSQL_PORT=3306
-      - MYSQL_USER=root
-      - MYSQL_PASS=a7m1425.
+  # mysql-restore:
+  #   image: fradelg/mysql-cron-backup:1.13.1
+  #   container_name : cn_mysql_restore
+  #   command: "/restore.sh /backup/latest.db_credinsta.sql.gz"
+  #   depends_on:
+  #     - mysql_master
+  #   volumes:
+  #     - ./BackUp:/backup
+  #   environment:
+  #     - MYSQL_HOST=mysql_master
+  #     - MYSQL_PORT=3306
+  #     - MYSQL_USER=root
+  #     - MYSQL_PASS=a7m1425.
 
   rclone-gdrive:
     container_name: cn_credi_rclone
