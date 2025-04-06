@@ -76,6 +76,8 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASS_CREDI}
       MYSQL_LOWER_CASE_TABLE_NAMES: 0
     restart: always
+    volumes:
+      - ./mysql:/var/lib/mysql
     ports:
       - 4406:3306
 
