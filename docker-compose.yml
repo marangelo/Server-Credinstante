@@ -8,8 +8,8 @@ services:
     volumes:
       - "./www/app01:/app/credinstantes"
       - "./default.tmpl:/kool/default.tmpl"
-    # ports:
-    #   - "84:80"
+    ports:
+      - "84:80"
     environment:
       - APP_NAME=credinstantes
       - PHP_FPM_LISTEN=/run/php-fpm.sock
@@ -32,8 +32,8 @@ services:
     volumes:
       - "./www/app02:/app/site"
       - "./default.tmpl:/kool/default.tmpl"
-    # ports:
-    #   - "82:80"
+    ports:
+      - "82:80"
     environment:
       - APP_NAME=site
       - PHP_FPM_LISTEN=/run/php-fpm.sock
