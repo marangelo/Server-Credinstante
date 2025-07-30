@@ -1,29 +1,12 @@
 version: "3.7"
 services:
-  nginx-proxy-manager:
-    image: 'jc21/nginx-proxy-manager:2.11.1'
-    container_name: cn_nginx-proxy-manage 
-    ports:
-      - '80:80'
-      - '81:81'
-      - '443:443'
-    environment:
-      DB_MYSQL_HOST: mysql_server
-      DB_MYSQL_PORT: 3306
-      DB_MYSQL_USER: "root"
-      DB_MYSQL_PASSWORD: ${PZW_ROOT}
-      DB_MYSQL_NAME: "npm"
-    volumes:
-      - ./data:/data
-      - ./letsencrypt:/etc/letsencrypt
-
-  web_credinstante:
-    container_name: cn_credi-app
+  web_app01:
+    container_name: cn_web_app01
     #image: kooldev/php:7.4-nginx-sqlsrv
     image: kooldev/php:7.4-nginx-sqlsrv-prod
     restart: always
     volumes:
-      - "./www/credinstantes:/app/credinstantes"
+      - "./www/app01:/app/credinstantes"
       - "./default.tmpl:/kool/default.tmpl"
     # ports:
     #   - "84:80"
@@ -41,13 +24,13 @@ services:
       - PHP_UPLOAD_MAX_FILESIZE=50M
       - PHP_POST_MAX_SIZE=50M
 
-  web_credi-site:
-    container_name: cn_credi-site
+  web_app02:
+    container_name: cn_web_app02
     #image: kooldev/php:7.4-nginx-sqlsrv
     image: kooldev/php:7.4-nginx
     restart: always
     volumes:
-      - "./www/site:/app/site"
+      - "./www/app02:/app/site"
       - "./default.tmpl:/kool/default.tmpl"
     # ports:
     #   - "82:80"
@@ -79,7 +62,7 @@ services:
     ports:
       - 4406:3306
 
-
+  # ESTE CONTENEDENDOR ES PARA RESPALDO DE MYSQL
   mysql-backup:
     container_name : cn_mysql_backup
     image: fradelg/mysql-cron-backup:1.13.1
@@ -96,38 +79,25 @@ services:
       - GZIP_LEVEL=9
     restart: unless-stopped
 
-  # mysql-restore:
-  #   image: fradelg/mysql-cron-backup:1.13.1
-  #   container_name : cn_mysql_restore
-  #   command: "/restore.sh /backup/latest.db_credinsta.sql.gz"
-  #   depends_on:
-  #     - mysql_master
+  # ESTE CONTENEDENDOR ES PARA RESPALDO DE GOOGLE DRIVE , PERO SE NECESITA CONFIGURARLO
+  # rclone-gdrive:
+  #   container_name: cn_credi_rclone
+  #   image: pfidr/rclone:1.63.0  
+  #   restart: unless-stopped
   #   volumes:
-  #     - ./BackUp:/backup
+  #     - ./rclone:/config
+  #     - ./BackUp:/gdrive
   #   environment:
-  #     - MYSQL_HOST=mysql_master
-  #     - MYSQL_PORT=3306
-  #     - MYSQL_USER=root
-  #     - MYSQL_PASS=a7m1425.
-
-  rclone-gdrive:
-    container_name: cn_credi_rclone
-    image: pfidr/rclone:1.63.0  
-    restart: unless-stopped
-    volumes:
-      - ./rclone:/config
-      - ./BackUp:/gdrive
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - "RCLONE_CMD=sync"
-      - "TZ=America/Managua"
-      - "SYNC_SRC=/gdrive"
-      - "SYNC_DEST=gdrive:/BackUp"
-      - "CRON=20 23 * * *"
-      - "FORCE_SYNC=1"
-      - "SYNC_OPTS=-v"
-      - "CHECK_URL=https://hc-ping.com/f927de2e-995f-4296-bd83-e2ffd8274a59"
+  #     - PUID=1000
+  #     - PGID=1000
+  #     - "RCLONE_CMD=sync"
+  #     - "TZ=America/Managua"
+  #     - "SYNC_SRC=/gdrive"
+  #     - "SYNC_DEST=gdrive:/BackUp"
+  #     - "CRON=20 23 * * *"
+  #     - "FORCE_SYNC=1"
+  #     - "SYNC_OPTS=-v"
+  #     - "CHECK_URL=https://hc-ping.com/f927de2e-995f-4296-bd83-e2ffd8274a59"
 
   phpmyadmin:
     container_name: cn_phpmyadmin
