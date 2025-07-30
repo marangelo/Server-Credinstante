@@ -1,20 +1,21 @@
 version: "3.7"
 services:
+  # SERVICIO DE PHP CON NGINX Y SQLSRV PENSADO PARA LARAVEL
   web_app01:
     container_name: cn_web_app01
     #image: kooldev/php:7.4-nginx-sqlsrv
     image: kooldev/php:7.4-nginx-sqlsrv-prod
     restart: always
     volumes:
-      - "./www/app01:/app/credinstantes"
+      - "./www/app01:/app/app01"
       - "./default.tmpl:/kool/default.tmpl"
     ports:
       - "84:80"
     environment:
-      - APP_NAME=credinstantes
+      - APP_NAME=app01
       - PHP_FPM_LISTEN=/run/php-fpm.sock
       - NGINX_LISTEN=80
-      - NGINX_ROOT=/app/credinstantes/public
+      - NGINX_ROOT=/app/app01/public
       - NGINX_INDEX=index.php
       - NGINX_CLIENT_MAX_BODY_SIZE=25M
       - NGINX_PHP_FPM=unix:/run/php-fpm.sock
@@ -24,21 +25,22 @@ services:
       - PHP_UPLOAD_MAX_FILESIZE=50M
       - PHP_POST_MAX_SIZE=50M
 
+  # SERVICIO DE PHP CON NGINX PENSADO PARA SITIOS ESTATICOS
   web_app02:
     container_name: cn_web_app02
     #image: kooldev/php:7.4-nginx-sqlsrv
     image: kooldev/php:7.4-nginx
     restart: always
     volumes:
-      - "./www/app02:/app/site"
+      - "./www/app02:/app/app02"
       - "./default.tmpl:/kool/default.tmpl"
     ports:
       - "82:80"
     environment:
-      - APP_NAME=site
+      - APP_NAME=app02
       - PHP_FPM_LISTEN=/run/php-fpm.sock
       - NGINX_LISTEN=80
-      - NGINX_ROOT=/app/site
+      - NGINX_ROOT=/app/app02
       - NGINX_INDEX=index.html
       - NGINX_CLIENT_MAX_BODY_SIZE=25M
       - NGINX_PHP_FPM=unix:/run/php-fpm.sock
